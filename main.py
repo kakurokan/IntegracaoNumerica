@@ -1,4 +1,4 @@
-from sympy import symbols, parse_expr, E, lambdify
+from sympy import symbols, parse_expr, E, lambdify, SympifyError
 from sympy.parsing.sympy_parser import (
     implicit_multiplication_application,
     standard_transformations,
@@ -44,35 +44,74 @@ def tabela_ou_funcao():
 
 def regra_trapezio(x0, x1, f):
     h = x1 - x0
-    soma = f(x0) + f(x1)
+
+    if callable(f):
+        y0 = f(x0)
+        y1 = f(x1)
+    else:
+        y0 = x0
+        y1 = x1
+
+    soma = y0 + y1
     return h / 2 * soma
 
 
 def regra_simpson(x0, x2, f):
     h = (x2 - x0) / 2
-    x1 = x0 + h
-    soma = f(x0) + 4 * f(x1) + f(x2)
+
+    if callable(f):
+        y0 = f(x0)
+        y1 = f(x0 + h)
+        y2 = f(x2)
+    else:
+        y0 = x0
+        y1 = f[1]
+        y2 = x2
+
+    soma = y0 + 4 * y1 + y2
 
     return h / 3 * soma
 
 
 def regra_simpson_3_8(x0, x3, f):
     h = (x3 - x0) / 3
-    soma = f(x0) + f(x3)
+
+    if callable(f):
+        y0 = f(x0)
+        y3 = f(x3)
+    else:
+        y0 = x0
+        y3 = x3
+
+    soma = y0 + y3
 
     for i in range(1, 3):
-        xi = x0 + i * h
-        soma += 3 * f(xi)
+        if callable(f):
+            yi = f(x0 + i * h)
+        else:
+            yi = f[i]
+
+        soma += 3 * yi
 
     return 3 * h / 8 * soma
 
 
 def regra_boole(x0, x4, f):
     h = (x4 - x0) / 4
-    x1 = x0 + h
-    x2 = x0 + 2 * h
-    x3 = x0 + 3 * h
-    soma = 7 * f(x0) + 32 * f(x1) + 12 * f(x2) + 32 * f(x3) + 7 * f(x4)
+
+    if callable(f):
+        y0 = f(x0)
+        y1 = f(x0 + h)
+        y2 = f(x0 + 2 * h)
+        y3 = f(x0 + 3 * h)
+    else:
+        y0 = x0
+        y1 = f[1]
+        y2 = f[2]
+        y3 = f[3]
+        y4 = x4
+
+    soma = 7 * y0 + 32 * y1 + 12 * y2 + 32 * y3 + 7 * y4
     return (2 * h / 45) * soma
 
 
@@ -89,37 +128,73 @@ def newton_cotes_fechadas(a, b, f, n):
 
 
 def regra_ponto_medio(a, b, f):
-    h = b - a / 2
-    x0 = a + h
-    return 2 * h * f(x0)
+    h = (b - a) / 2
+
+    if callable(f):
+        y0 = f(a + h)
+    else:
+        y0 = f[1]
+
+    return 2 * h * y0
 
 
 def abertas_um(a, b, f):
-    h = b - a / 3
-    x0 = a + h
-    x1 = b - h
-    soma = f(x0) + f(x1)
+    h = (b - a) / 3
+
+    if callable(f):
+        x0 = a + h
+        x1 = b - h
+
+        y0 = f(x0)
+        y1 = f(x1)
+    else:
+        y0 = f[1]
+        y1 = f[2]
+
+    soma = y0 + y1
     return 3 * h / 2 * soma
 
 
 def regra_milne(a, b, f):
-    h = b - a / 4
-    x0 = a + h
-    x1 = x0 + h
-    x2 = b - h
+    h = (b - a) / 4
 
-    soma = 2 * f(x0) - f(x1) + 2 * f(x2)
+    if callable(f):
+        x0 = a + h
+        x1 = x0 + h
+        x2 = b - h
+
+        y0 = f(x0)
+        y1 = f(x1)
+        y2 = f(x2)
+    else:
+        y0 = f[1]
+        y1 = f[2]
+        y2 = f[3]
+
+    soma = 2 * y0 - y1 + 2 * y2
     return 4 * h / 3 * soma
 
 
 def abertas_tres(a, b, f):
-    h = a - b / 5
-    x0 = a + h
-    x1 = x0 + h
-    x2 = x0 + h * 2
-    x3 = b - h
+    h = (b - a) / 5
 
-    soma = 11 * f(x0) + f(x1) + f(x2) + 11 * f(x3)
+    if callable(f):
+        x0 = a + h
+        x1 = x0 + h
+        x2 = x0 + h * 2
+        x3 = b - h
+
+        y0 = f(x0)
+        y1 = f(x1)
+        y2 = f(x2)
+        y3 = f(x3)
+    else:
+        y0 = f[1]
+        y1 = f[2]
+        y2 = f[3]
+        y3 = f[4]
+
+    soma = 11 * y0 + y1 + y2 + 11 * y3
     return 5 * h / 24 * soma
 
 
@@ -136,17 +211,12 @@ def newton_cotes_abertas(a, b, f, n):
 
 
 def ler_tabela(n):
-    print(f"Insira os valores da tablea com {n} pontos")
+    print(f"Insira os valores da tabela com {n} pontos equidistantes")
 
     pontos = []
-    h = 0
 
     for i in range(n):
-        if i >= 2:
-            h = abs(pontos[i - 1] - pontos[i - 2])
-        numero = input(f"Insira o ponto {i}: ").strip()
-        if abs(pontos[i] - pontos[i - 1] != h):
-            raise IntervaloInvalido
+        numero = float(input(f"Insira o ponto {i}: ").strip())
         pontos.append(numero)
 
     return pontos
@@ -163,10 +233,10 @@ def ler_funcao():
         "x": x,
         "e": E,
     }  # Permite que o parse reconhece e = exp() e x como variável
-    f = parse_expr(
+    f_exp = parse_expr(
         f, local_dict=locals_vars, transformations=transformations
     )  # Converte o input numa expressão sympy
-    f = lambdify(x, f, modules="math")  # Converte a função em método
+    f = lambdify(x, f_exp, modules="math")  # Converte a função em método
 
     return f
 
@@ -182,32 +252,43 @@ def escolha_pontos(tipo):
 
 def main():
     rodando = True
+
     while rodando:
 
-        escolha = escolha_metodo()
-        n = escolha_pontos(escolha)
-        tipo = tabela_ou_funcao()
+        try:
+            escolha = escolha_metodo()
+            n = escolha_pontos(escolha)
+            tipo = tabela_ou_funcao()
 
-        if tipo == "F":
-            f = ler_funcao()
+            if tipo == "F":
+                f = ler_funcao()
 
-            print("Insira o intervalo de integração [a; b]:")
-            a = float(input("a: ").strip())
-            b = float(input("b: ").strip())
-            if a >= b:
-                print("Erro: a deve ser menor que b. Tente novamente.")
-                continue
-        else:
-            f = ler_tabela(n)
-            a = f[0]
-            b = f[n - 1]
+                print("Insira o intervalo de integração [a; b]:")
+                a = float(input("a: ").strip())
+                b = float(input("b: ").strip())
+                if a >= b:
+                    print("Erro: a deve ser menor que b. Tente novamente.")
+                    continue
+            else:
+                f = ler_tabela(n)
+                a = f[0]
+                b = f[n - 1]
 
-        if escolha == "F":
-            newton_cotes_fechadas(a, b, f, n)
-        else:
-            newton_cotes_abertas(a, b, f, n)
+            if escolha == "F":
+                resultado = newton_cotes_fechadas(a, b, f, n)
+            else:
+                resultado = newton_cotes_abertas(a, b, f, n)
 
-        rodando = input("\nDeseja continuar? (s/n) ").strip().lower() == "s"
+            print("O resultado aproximado para integral é: " + str(resultado))
+
+            rodando = input("\nDeseja continuar? (s/n) ").strip().lower() == "s"
+
+        except SympifyError as e:
+            print(f"Erro de sintaxe: {e}")
+        except ValueError as e:
+            print(e)
+        except Exception as e:
+            print(f"Erro inesperado: {e}")
 
 
 main()
