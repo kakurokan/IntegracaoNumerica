@@ -18,6 +18,10 @@ class fora_do_intervalo(Exception):
     pass
 
 
+class precisa_ser_4(Exception):
+    pass
+    
+
 def escolha_metodo():
     while True:
         print(
@@ -34,12 +38,28 @@ def escolha_metodo():
             print("\nErro: Entrada inválida. Por favor, digite apenas 1 ou 2.\n")
 
 
-def regra_trapezio(x0, x1, f):
-    h = x1 - x0
-    soma = f(x0) + f(x1)
+def newton_cotes_fechadas(a, b, f, n):
+    if n == 1:
+        return trapezio_composto(a, b, f, n)
+    elif n == 2:
+        return regra_simpson(a, b, f, n)
+    elif n == 3:
+        return regra_simpson2(a, b, f, n)
+    elif n == 4:
+        return regra_boole(a, b, f, n)
+    else:
+        raise fora_do_intervalo
 
-    return (h / 2) * soma
+def trapezio_composto(x0, xn, f, n):
+    h = (xn - x0) / n
+    soma = f(x0) + f(xn)
 
+    for i in range(1,n):
+        xi = x0 + i * h
+        soma += 2 * f(xi)
+
+    IT = (h/2) * soma
+    return IT
 
 def regra_simpson(x0, xn, f, n):
     if n % 2 != 0:
@@ -53,9 +73,8 @@ def regra_simpson(x0, xn, f, n):
     for i in range(2, n, 2):
         soma += 2 * f(x0 + i * h)
 
-    IT = (h / 3) * soma
+    IT = (h/3) * soma
     return IT
-
 
 def regra_simpson2(x0, xn, f, n):
     if n % 3 != 0:
@@ -71,9 +90,17 @@ def regra_simpson2(x0, xn, f, n):
         else:
             soma += 3 * f(xi)
 
-    IT = ((3 * h) / 8) * soma
+    IT = ((3*h)/8) * soma
     return IT
 
+def regra_boole(x0, xn, f, n):
+    if n != 4:
+        raise precisa_ser_4
+    h = (xn - x0) / n
+    x1 = x0 + h
+    x2 = x0 + 2*h
+    x3 = x0 + 3*h
+    return (2*h/45) * (7*f(x0) + 32*f(x1) + 12*f(x2) + 32*f(x3) + 7*f(xn))
 
 def newton_cotes_abertas(a, b, f, n):
     h = (b - a) / (n + 2)
