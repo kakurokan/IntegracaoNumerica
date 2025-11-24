@@ -6,21 +6,9 @@ from sympy.parsing.sympy_parser import (
 )
 
 
-class n_nao_par(Exception):
+class ForaDoIntervalo(Exception):
     pass
 
-
-class n_multiplo_de_3(Exception):
-    pass
-
-
-class fora_do_intervalo(Exception):
-    pass
-
-
-class precisa_ser_4(Exception):
-    pass
-    
 
 def escolha_metodo():
     while True:
@@ -38,90 +26,99 @@ def escolha_metodo():
             print("\nErro: Entrada inválida. Por favor, digite apenas 1 ou 2.\n")
 
 
+def regra_trapezio(x0, x1, f):
+    h = x1 - x0
+    soma = f(x0) + f(x1)
+    return h / 2 * soma
+
+
+def regra_simpson(x0, x2, f):
+    h = (x2 - x0) / 2
+    x1 = x0 + h
+    soma = f(x0) + 4 * f(x1) + f(x2)
+
+    return h / 3 * soma
+
+
+def regra_simpson_3_8(x0, x3, f):
+    h = (x3 - x0) / 3
+    soma = f(x0) + f(x3)
+
+    for i in range(1, 3):
+        xi = x0 + i * h
+        soma += 3 * f(xi)
+
+    return 3 * h / 8 * soma
+
+
+def regra_boole(x0, x4, f):
+    h = (x4 - x0) / 4
+    x1 = x0 + h
+    x2 = x0 + 2 * h
+    x3 = x0 + 3 * h
+    soma = 7 * f(x0) + 32 * f(x1) + 12 * f(x2) + 32 * f(x3) + 7 * f(x4)
+    return (2 * h / 45) * soma
+
+
 def newton_cotes_fechadas(a, b, f, n):
     if n == 1:
-        return trapezio_composto(a, b, f, n)
+        return regra_trapezio(a, b, f)
     elif n == 2:
-        return regra_simpson(a, b, f, n)
+        return regra_simpson(a, b, f)
     elif n == 3:
-        return regra_simpson2(a, b, f, n)
+        return regra_simpson_3_8(a, b, f)
     elif n == 4:
-        return regra_boole(a, b, f, n)
+        return regra_boole(a, b, f)
     else:
-        raise fora_do_intervalo
+        raise ForaDoIntervalo
 
-def trapezio_composto(x0, xn, f, n):
-    h = (xn - x0) / n
-    soma = f(x0) + f(xn)
 
-    for i in range(1,n):
-        xi = x0 + i * h
-        soma += 2 * f(xi)
+def regra_ponto_medio(a, b, f):
+    h = b - a / 2
+    x0 = a + h
+    return 2 * h * f(x0)
 
-    IT = (h/2) * soma
-    return IT
 
-def regra_simpson(x0, xn, f, n):
-    if n % 2 != 0:
-        raise n_nao_par
-    h = (xn - x0) / n
-    soma = f(x0) + f(xn)
+def abertas_um(a, b, f):
+    h = b - a / 3
+    x0 = a + h
+    x1 = b - h
+    soma = f(x0) + f(x1)
+    return 3 * h / 2 * soma
 
-    for i in range(1, n, 2):
-        soma += 4 * f(x0 + i * h)
 
-    for i in range(2, n, 2):
-        soma += 2 * f(x0 + i * h)
-
-    IT = (h/3) * soma
-    return IT
-
-def regra_simpson2(x0, xn, f, n):
-    if n % 3 != 0:
-        raise n_multiplo_de_3
-
-    h = (xn - x0) / n
-    soma = f(x0) + f(xn)
-
-    for i in range(1, n):
-        xi = x0 + i * h
-        if i % 3 == 0:
-            soma += 2 * f(xi)
-        else:
-            soma += 3 * f(xi)
-
-    IT = ((3*h)/8) * soma
-    return IT
-
-def regra_boole(x0, xn, f, n):
-    if n != 4:
-        raise precisa_ser_4
-    h = (xn - x0) / n
+def regra_milne(a, b, f):
+    h = b - a / 4
+    x0 = a + h
     x1 = x0 + h
-    x2 = x0 + 2*h
-    x3 = x0 + 3*h
-    return (2*h/45) * (7*f(x0) + 32*f(x1) + 12*f(x2) + 32*f(x3) + 7*f(xn))
+    x2 = b - h
+
+    soma = 2 * f(x0) - f(x1) + 2 * f(x2)
+    return 4 * h / 3 * soma
+
+
+def abertas_tres(a, b, f):
+    h = a - b / 5
+    x0 = a + h
+    x1 = x0 + h
+    x2 = x0 + h * 2
+    x3 = b - h
+
+    soma = 11 * f(x0) + f(x1) + f(x2) + 11 * f(x3)
+    return 5 * h / 24 * soma
+
 
 def newton_cotes_abertas(a, b, f, n):
-    h = (b - a) / (n + 2)
-    x0 = a + h
-
-    if n == 0:  # Ponto medio a guess
-        return 2 * h * f(x0)
-    elif n == 1:  # Não sei o nome
-        x1 = x0 + h
-        return ((3 * h) / 2) * (f(x0) + f(x1))
+    if n == 0:
+        return regra_ponto_medio(a, b, f)
+    elif n == 1:
+        return abertas_um(a, b, f)
     elif n == 2:
-        x1 = x0 + h
-        x2 = x0 + 2 * h
-        return ((4 * h) / 3) * (2 * f(x0) - f(x1) + 2 * f(x2))
+        return regra_milne(a, b, f)
     elif n == 3:
-        x1 = x0 + h
-        x2 = x0 + 2 * h
-        x3 = x0 + 3 * h
-        return (5 * h / 24) * (11 * f(x0) + f(x1) + f(x2) + 11 * f(x3))
+        return abertas_tres(a, b, f)
     else:
-        raise fora_do_intervalo
+        raise ForaDoIntervalo
 
 
 def ler_funcao():
