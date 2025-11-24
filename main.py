@@ -6,7 +6,7 @@ from sympy.parsing.sympy_parser import (
 )
 
 
-class ForaDoIntervalo(Exception):
+class IntervaloInvalido(Exception):
     pass
 
 
@@ -22,6 +22,22 @@ def escolha_metodo():
             return "F"
         elif escolha == "2":
             return "A"
+        else:
+            print("\nErro: Entrada inválida. Por favor, digite apenas 1 ou 2.\n")
+
+
+def tabela_ou_funcao():
+    while True:
+        print(
+            "\nEscolha o tipo do input:\n",
+            "1) Função\n",
+            "2) Tabela\n",
+        )
+        escolha = input("Digite o número (1 ou 2): ").strip()
+        if escolha == "1":
+            return "F"
+        elif escolha == "2":
+            return "T"
         else:
             print("\nErro: Entrada inválida. Por favor, digite apenas 1 ou 2.\n")
 
@@ -69,8 +85,7 @@ def newton_cotes_fechadas(a, b, f, n):
         return regra_simpson_3_8(a, b, f)
     elif n == 4:
         return regra_boole(a, b, f)
-    else:
-        raise ForaDoIntervalo
+    return None
 
 
 def regra_ponto_medio(a, b, f):
@@ -117,8 +132,24 @@ def newton_cotes_abertas(a, b, f, n):
         return regra_milne(a, b, f)
     elif n == 3:
         return abertas_tres(a, b, f)
-    else:
-        raise ForaDoIntervalo
+    return None
+
+
+def ler_tabela(n):
+    print(f"Insira os valores da tablea com {n} pontos")
+
+    pontos = []
+    h = 0
+
+    for i in range(n):
+        if i >= 2:
+            h = abs(pontos[i - 1] - pontos[i - 2])
+        numero = input(f"Insira o ponto {i}: ").strip()
+        if abs(pontos[i] - pontos[i - 1] != h):
+            raise IntervaloInvalido
+        pontos.append(numero)
+
+    return pontos
 
 
 def ler_funcao():
@@ -154,14 +185,27 @@ def main():
     while rodando:
 
         escolha = escolha_metodo()
-        f = ler_funcao()
+        n = escolha_pontos(escolha)
+        tipo = tabela_ou_funcao()
 
-        print("Insira o intervalo de integração [a; b]:")
-        a = float(input("a: ").strip())
-        b = float(input("b: ").strip())
-        if a >= b:
-            print("Erro: a deve ser menor que b. Tente novamente.")
-            continue
+        if tipo == "F":
+            f = ler_funcao()
+
+            print("Insira o intervalo de integração [a; b]:")
+            a = float(input("a: ").strip())
+            b = float(input("b: ").strip())
+            if a >= b:
+                print("Erro: a deve ser menor que b. Tente novamente.")
+                continue
+        else:
+            f = ler_tabela(n)
+            a = f[0]
+            b = f[n - 1]
+
+        if escolha == "F":
+            newton_cotes_fechadas(a, b, f, n)
+        else:
+            newton_cotes_abertas(a, b, f, n)
 
         rodando = input("\nDeseja continuar? (s/n) ").strip().lower() == "s"
 
