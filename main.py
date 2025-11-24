@@ -1,4 +1,4 @@
-from sympy import symbols, parse_expr, E, lambdify, SympifyError
+from sympy import symbols, parse_expr, E, lambdify, SympifyError, pi
 from sympy.parsing.sympy_parser import (
     implicit_multiplication_application,
     standard_transformations,
@@ -24,6 +24,29 @@ def escolha_metodo():
             return "A"
         else:
             print("\nErro: Entrada inválida. Por favor, digite apenas 1 ou 2.\n")
+
+
+def ler_valor_matematico(entrada):
+    while True:
+        # Configuração para entender 'pi', 'e', '^', multiplicação implícita
+        transformations = standard_transformations + (
+            implicit_multiplication_application,
+            convert_xor,
+        )
+        local_context = {"pi": pi, "e": E}
+
+        try:
+            expr = parse_expr(
+                entrada, local_dict=local_context, transformations=transformations
+            )
+
+            # 2. Avalia a expressão para um número real (float)
+            valor_float = float(expr.evalf())
+
+            return valor_float
+
+        except Exception as e:
+            print(f"Entrada inválida ({entrada}). Tente algo como 'pi', 'pi/2', '1.5'.")
 
 
 def tabela_ou_funcao():
@@ -232,6 +255,7 @@ def ler_funcao():
     locals_vars = {
         "x": x,
         "e": E,
+        "pi": pi,
     }  # Permite que o parse reconhece e = exp() e x como variável
     f_exp = parse_expr(
         f, local_dict=locals_vars, transformations=transformations
@@ -264,8 +288,8 @@ def main():
                 f = ler_funcao()
 
                 print("Insira o intervalo de integração [a; b]:")
-                a = float(input("a: ").strip())
-                b = float(input("b: ").strip())
+                a = ler_valor_matematico(input("a: ").strip())
+                b = ler_valor_matematico(input("b: ").strip())
                 if a >= b:
                     print("Erro: a deve ser menor que b. Tente novamente.")
                     continue
