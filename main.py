@@ -322,9 +322,13 @@ def main():
                 resultado = newton_cotes_abertas(a, b, f, n)
 
             print(
-                "RESULTADO FINAL:\n",
-                "Regra: " + FECHADAS.get(n) if (escolha == "F") else ABERTAS.get(n),
-                "Valor final: " + str(resultado),
+                "RESULTADO FINAL:",
+                (
+                    "\nMétodo: " + FECHADAS.get(n)
+                    if (escolha == "F")
+                    else ABERTAS.get(n)
+                ),
+                "\nValor final: " + str(resultado),
             )
 
             rodando = input("\nDeseja continuar? (s/n) ").strip().lower() == "s"
