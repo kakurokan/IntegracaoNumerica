@@ -307,7 +307,7 @@ def main():
             else:
                 f = ler_tabela(n)
                 a = f[0]
-                b = f[n - 1]
+                b = f[n]
 
             if escolha == "F":
                 resultado = newton_cotes_fechadas(a, b, f, n)
