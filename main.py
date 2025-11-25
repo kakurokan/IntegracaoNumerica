@@ -176,8 +176,8 @@ def abertas_um(a, b, f):
         y0 = f(x0)
         y1 = f(x1)
     else:
-        y0 = f[1]
-        y1 = f[2]
+        y0 = f[0]
+        y1 = f[1]
 
     soma = y0 + y1
     return 3 * h / 2 * soma
@@ -195,9 +195,9 @@ def regra_milne(a, b, f):
         y1 = f(x1)
         y2 = f(x2)
     else:
-        y0 = f[1]
-        y1 = f[2]
-        y2 = f[3]
+        y0 = f[0]
+        y1 = f[1]
+        y2 = f[2]
 
     soma = 2 * y0 - y1 + 2 * y2
     return 4 * h / 3 * soma
@@ -217,10 +217,10 @@ def abertas_tres(a, b, f):
         y2 = f(x2)
         y3 = f(x3)
     else:
-        y0 = f[1]
-        y1 = f[2]
-        y2 = f[3]
-        y3 = f[4]
+        y0 = f[0]
+        y1 = f[1]
+        y2 = f[2]
+        y3 = f[3]
 
     soma = 11 * y0 + y1 + y2 + 11 * y3
     return 5 * h / 24 * soma
