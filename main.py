@@ -19,10 +19,6 @@ ABERTAS = {
 }
 
 
-class IntervaloInvalido(Exception):
-    pass
-
-
 def escolha_metodo():
     while True:
         print(
@@ -244,13 +240,13 @@ def newton_cotes_abertas(a, b, f, n):
 
 def ler_tabela(n):
     print(
-        f"O método escolhido requer exatamente {n} pontos.",
+        f"O método escolhido requer exatamente {n + 1} pontos.",
         "Insira os valores de f(x) (ou y) sequencialmente.",
     )
 
     pontos = []
 
-    for i in range(n):
+    for i in range(n + 1):
         numero = ler_valor_matematico(input(f"Insira o ponto {i}: ").strip())
         pontos.append(numero)
 
@@ -309,10 +305,7 @@ def main():
                     print("Erro: a deve ser menor que b. Tente novamente.")
                     continue
             else:
-                if tipo == "F":
-                    f = ler_tabela(n + 1)
-                else:
-                    f = ler_tabela(n)
+                f = ler_tabela(n)
                 a = f[0]
                 b = f[n - 1]
 
