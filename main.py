@@ -76,8 +76,8 @@ def regra_trapezio(x0, x1, f):
         y0 = f(x0)
         y1 = f(x1)
     else:
-        y0 = x0
-        y1 = x1
+        y0 = f[0]
+        y1 = f[1]
 
     soma = y0 + y1
     return h / 2 * soma
@@ -91,9 +91,9 @@ def regra_simpson(x0, x2, f):
         y1 = f(x0 + h)
         y2 = f(x2)
     else:
-        y0 = x0
+        y0 = f[0]
         y1 = f[1]
-        y2 = x2
+        y2 = f[2]
 
     soma = y0 + 4 * y1 + y2
 
@@ -107,8 +107,8 @@ def regra_simpson_3_8(x0, x3, f):
         y0 = f(x0)
         y3 = f(x3)
     else:
-        y0 = x0
-        y3 = x3
+        y0 = f[0]
+        y3 = f[3]
 
     soma = y0 + y3
 
@@ -133,11 +133,11 @@ def regra_boole(x0, x4, f):
         y3 = f(x0 + 3 * h)
         y4 = f(x4)
     else:
-        y0 = x0
+        y0 = f[0]
         y1 = f[1]
         y2 = f[2]
         y3 = f[3]
-        y4 = x4
+        y4 = f[4]
 
     soma = 7 * y0 + 32 * y1 + 12 * y2 + 32 * y3 + 7 * y4
     return (2 * h / 45) * soma
@@ -297,17 +297,15 @@ def main():
 
             if tipo == "F":
                 f = ler_funcao()
-
-                print("Insira o intervalo de integração [a; b]:")
-                a = ler_valor_matematico(input("Limite inferior (a): ").strip())
-                b = ler_valor_matematico(input("Limite superior (b): ").strip())
-                if a >= b:
-                    print("Erro: a deve ser menor que b. Tente novamente.")
-                    continue
             else:
                 f = ler_tabela(n)
-                a = f[0]
-                b = f[n]
+
+            print("Insira o intervalo de integração [a; b]:")
+            a = ler_valor_matematico(input("Limite inferior (a): ").strip())
+            b = ler_valor_matematico(input("Limite superior (b): ").strip())
+            if a >= b:
+                print("Erro: a deve ser menor que b. Tente novamente.")
+                continue
 
             if escolha == "F":
                 resultado = newton_cotes_fechadas(a, b, f, n)
