@@ -27,26 +27,21 @@ def escolha_metodo():
 
 
 def ler_valor_matematico(entrada):
-    while True:
-        # Configuração para entender 'pi', 'e', '^', multiplicação implícita
-        transformations = standard_transformations + (
-            implicit_multiplication_application,
-            convert_xor,
-        )
-        local_context = {"pi": pi, "e": E}
+    # Configuração para entender 'pi', 'e', '^', multiplicação implícita
+    transformations = standard_transformations + (
+        implicit_multiplication_application,
+        convert_xor,
+    )
+    local_context = {"pi": pi, "e": E}
 
-        try:
-            expr = parse_expr(
-                entrada, local_dict=local_context, transformations=transformations
-            )
+    expr = parse_expr(
+        entrada, local_dict=local_context, transformations=transformations
+    )
 
-            # 2. Avalia a expressão para um número real (float)
-            valor_float = float(expr.evalf())
+    # 2. Avalia a expressão para um número real (float)
+    valor_float = float(expr.evalf())
 
-            return valor_float
-
-        except Exception as e:
-            print(f"Entrada inválida ({entrada}). Tente algo como 'pi', 'pi/2', '1.5'.")
+    return valor_float
 
 
 def tabela_ou_funcao():
@@ -127,6 +122,7 @@ def regra_boole(x0, x4, f):
         y1 = f(x0 + h)
         y2 = f(x0 + 2 * h)
         y3 = f(x0 + 3 * h)
+        y4 = f(x4)
     else:
         y0 = x0
         y1 = f[1]
@@ -239,7 +235,7 @@ def ler_tabela(n):
     pontos = []
 
     for i in range(n):
-        numero = float(input(f"Insira o ponto {i}: ").strip())
+        numero = ler_valor_matematico(input(f"Insira o ponto {i}: ").strip())
         pontos.append(numero)
 
     return pontos
@@ -294,7 +290,10 @@ def main():
                     print("Erro: a deve ser menor que b. Tente novamente.")
                     continue
             else:
-                f = ler_tabela(n)
+                if tipo == "F":
+                    f = ler_tabela(n + 1)
+                else:
+                    f = ler_tabela(n)
                 a = f[0]
                 b = f[n - 1]
 
