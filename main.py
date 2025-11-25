@@ -230,7 +230,10 @@ def newton_cotes_abertas(a, b, f, n):
 
 
 def ler_tabela(n):
-    print(f"Insira os valores da tabela com {n} pontos equidistantes")
+    print(
+        f"O método escolhido requer exatamente {n} pontos.",
+        "Insira os valores de f(x) (ou y) sequencialmente.",
+    )
 
     pontos = []
 
@@ -273,8 +276,11 @@ def escolha_pontos(tipo):
 def main():
     rodando = True
 
-    while rodando:
+    print("*" * 65)
+    print("   Bem-vindo a calculadora de integração numérica")
+    print("*" * 65)
 
+    while rodando:
         try:
             escolha = escolha_metodo()
             n = escolha_pontos(escolha)
@@ -284,8 +290,8 @@ def main():
                 f = ler_funcao()
 
                 print("Insira o intervalo de integração [a; b]:")
-                a = ler_valor_matematico(input("a: ").strip())
-                b = ler_valor_matematico(input("b: ").strip())
+                a = ler_valor_matematico(input("Limite inferior (a): ").strip())
+                b = ler_valor_matematico(input("Limite superior (b): ").strip())
                 if a >= b:
                     print("Erro: a deve ser menor que b. Tente novamente.")
                     continue
