@@ -5,6 +5,19 @@ from sympy.parsing.sympy_parser import (
     convert_xor,
 )
 
+FECHADAS = {
+    1: "Regra do Trapézio",
+    2: "Regra de Simpson",
+    3: "Regra de Simpson dos 3/8",
+    4: "Regra de Boole",
+}
+ABERTAS = {
+    0: "Regra do Ponto Médio",
+    1: "Regra para n = 1",
+    2: "Regra de Milne",
+    3: "Regra para n = 3",
+}
+
 
 class IntervaloInvalido(Exception):
     pass
@@ -308,7 +321,11 @@ def main():
             else:
                 resultado = newton_cotes_abertas(a, b, f, n)
 
-            print("O resultado aproximado para integral é: " + str(resultado))
+            print(
+                "RESULTADO FINAL:\n",
+                "Regra: " + FECHADAS.get(n) if (escolha == "F") else ABERTAS.get(n),
+                "Valor final: " + str(resultado),
+            )
 
             rodando = input("\nDeseja continuar? (s/n) ").strip().lower() == "s"
 
