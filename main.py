@@ -161,7 +161,7 @@ def regra_ponto_medio(a, b, f):
     if callable(f):
         y0 = f(a + h)
     else:
-        y0 = f[1]
+        y0 = f[0]
 
     return 2 * h * y0
 
@@ -254,7 +254,8 @@ def ler_tabela(n):
 
 
 def ler_funcao():
-    x = symbols("x", real=True)  # Define x como variável real
+    x = symbols("x", real=True)
+
     f = input("Insira a função f(x): ").strip()
     transformations = standard_transformations + (
         implicit_multiplication_application,
@@ -270,7 +271,7 @@ def ler_funcao():
     )  # Converte o input numa expressão sympy
     f = lambdify(x, f_exp, modules="math")  # Converte a função em método
 
-    return f
+    return f, f_exp, x
 
 
 def escolha_pontos(tipo):
@@ -282,6 +283,19 @@ def escolha_pontos(tipo):
             return n
 
 
+def verificar_extremos(var, a, b, f):
+    try:
+        fa = f.subs(var, a).evalf()
+        fb = f.subs(var, b).evalf()
+
+        if not fa.is_finite or not fa.is_real or not fb.is_finite or not fb.is_real:
+            return False
+        return True
+    except Exception as e:
+        print(f" [ERRO] Não foi possível calcular em {a} ou {b}: {e}")
+        return False
+
+
 def main():
     rodando = True
 
@@ -291,13 +305,13 @@ def main():
 
     while rodando:
         try:
-            escolha = escolha_metodo()
-            n = escolha_pontos(escolha)
             tipo = tabela_ou_funcao()
 
             if tipo == "F":
-                f = ler_funcao()
+                f, f_exp, var = ler_funcao()
             else:
+                escolha = escolha_metodo()
+                n = escolha_pontos(escolha)
                 f = ler_tabela(n)
 
             print("Insira o intervalo de integração [a; b]:")
@@ -306,6 +320,18 @@ def main():
             if a >= b:
                 print("Erro: a deve ser menor que b. Tente novamente.")
                 continue
+
+            if tipo == "F":
+                if not verificar_extremos(var, a, b, f_exp):
+                    print(
+                        "\nA função inserida não é válida nos limites fornecidos.\n",
+                        "Não é possível utilizar as fórmulas de Newton-Cotes fechadas.\n",
+                    )
+                    escolha = "A"
+                else:
+                    escolha = escolha_metodo()
+
+                n = escolha_pontos(escolha)
 
             if escolha == "F":
                 resultado = newton_cotes_fechadas(a, b, f, n)
