@@ -47,10 +47,7 @@ def ler_valor_matematico(entrada):
         entrada, local_dict=local_context, transformations=transformations
     )
 
-    # 2. Avalia a expressão para um número real (float)
-    valor_float = float(expr.evalf())
-
-    return valor_float
+    return expr
 
 
 def tabela_ou_funcao():
@@ -248,7 +245,7 @@ def ler_tabela(n):
 
     for i in range(n + 1):
         numero = ler_valor_matematico(input(f"Insira o ponto {i}: ").strip())
-        pontos.append(numero)
+        pontos.append(float(numero.evalf()))
 
     return pontos
 
@@ -332,6 +329,9 @@ def main():
                     escolha = escolha_metodo()
 
                 n = escolha_pontos(escolha)
+
+            a = float(a.evalf())
+            b = float(b.evalf())
 
             if escolha == "F":
                 resultado = newton_cotes_fechadas(a, b, f, n)
