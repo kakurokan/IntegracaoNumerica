@@ -66,15 +66,18 @@ def tabela_ou_funcao():
             print("\nErro: Entrada inválida. Por favor, digite apenas 1 ou 2.\n")
 
 
+def y_fechado(f, x0, i, h):
+    if callable(f):
+        return f(x0 + i * h)
+    else:
+        return f[i]
+
+
 def regra_trapezio(x0, x1, f):
     h = x1 - x0
 
-    if callable(f):
-        y0 = f(x0)
-        y1 = f(x1)
-    else:
-        y0 = f[0]
-        y1 = f[1]
+    y0 = y_fechado(f, x0, 0, h)
+    y1 = y_fechado(f, x0, 1, h)
 
     soma = y0 + y1
     return h / 2 * soma
@@ -83,14 +86,9 @@ def regra_trapezio(x0, x1, f):
 def regra_simpson(x0, x2, f):
     h = (x2 - x0) / 2
 
-    if callable(f):
-        y0 = f(x0)
-        y1 = f(x0 + h)
-        y2 = f(x2)
-    else:
-        y0 = f[0]
-        y1 = f[1]
-        y2 = f[2]
+    y0 = y_fechado(f, x0, 0, h)
+    y1 = y_fechado(f, x0, 1, h)
+    y2 = y_fechado(f, x0, 2, h)
 
     soma = y0 + 4 * y1 + y2
 
@@ -100,12 +98,8 @@ def regra_simpson(x0, x2, f):
 def regra_simpson_3_8(x0, x3, f):
     h = (x3 - x0) / 3
 
-    if callable(f):
-        y0 = f(x0)
-        y3 = f(x3)
-    else:
-        y0 = f[0]
-        y3 = f[3]
+    y0 = y_fechado(f, x0, 0, h)
+    y3 = y_fechado(f, x0, 3, h)
 
     soma = y0 + y3
 
@@ -123,18 +117,11 @@ def regra_simpson_3_8(x0, x3, f):
 def regra_boole(x0, x4, f):
     h = (x4 - x0) / 4
 
-    if callable(f):
-        y0 = f(x0)
-        y1 = f(x0 + h)
-        y2 = f(x0 + 2 * h)
-        y3 = f(x0 + 3 * h)
-        y4 = f(x4)
-    else:
-        y0 = f[0]
-        y1 = f[1]
-        y2 = f[2]
-        y3 = f[3]
-        y4 = f[4]
+    y0 = y_fechado(f, x0, 0, h)
+    y1 = y_fechado(f, x0, 1, h)
+    y2 = y_fechado(f, x0, 2, h)
+    y3 = y_fechado(f, x0, 3, h)
+    y4 = y_fechado(f, x0, 4, h)
 
     soma = 7 * y0 + 32 * y1 + 12 * y2 + 32 * y3 + 7 * y4
     return (2 * h / 45) * soma
@@ -152,13 +139,17 @@ def newton_cotes_fechadas(a, b, f, n):
     return None
 
 
+def y_aberto(f, a, i, h):
+    if callable(f):
+        return f(a + (i + 1) * h)
+    else:
+        return f[i]
+
+
 def regra_ponto_medio(a, b, f):
     h = (b - a) / 2
 
-    if callable(f):
-        y0 = f(a + h)
-    else:
-        y0 = f[0]
+    y0 = y_aberto(f, a, 0, h)
 
     return 2 * h * y0
 
@@ -166,15 +157,8 @@ def regra_ponto_medio(a, b, f):
 def abertas_um(a, b, f):
     h = (b - a) / 3
 
-    if callable(f):
-        x0 = a + h
-        x1 = b - h
-
-        y0 = f(x0)
-        y1 = f(x1)
-    else:
-        y0 = f[0]
-        y1 = f[1]
+    y0 = y_aberto(f, a, 0, h)
+    y1 = y_aberto(f, a, 1, h)
 
     soma = y0 + y1
     return 3 * h / 2 * soma
@@ -183,18 +167,9 @@ def abertas_um(a, b, f):
 def regra_milne(a, b, f):
     h = (b - a) / 4
 
-    if callable(f):
-        x0 = a + h
-        x1 = x0 + h
-        x2 = b - h
-
-        y0 = f(x0)
-        y1 = f(x1)
-        y2 = f(x2)
-    else:
-        y0 = f[0]
-        y1 = f[1]
-        y2 = f[2]
+    y0 = y_aberto(f, a, 0, h)
+    y1 = y_aberto(f, a, 1, h)
+    y2 = y_aberto(f, a, 2, h)
 
     soma = 2 * y0 - y1 + 2 * y2
     return 4 * h / 3 * soma
@@ -203,21 +178,10 @@ def regra_milne(a, b, f):
 def abertas_tres(a, b, f):
     h = (b - a) / 5
 
-    if callable(f):
-        x0 = a + h
-        x1 = x0 + h
-        x2 = x0 + h * 2
-        x3 = b - h
-
-        y0 = f(x0)
-        y1 = f(x1)
-        y2 = f(x2)
-        y3 = f(x3)
-    else:
-        y0 = f[0]
-        y1 = f[1]
-        y2 = f[2]
-        y3 = f[3]
+    y0 = y_aberto(f, a, 0, h)
+    y1 = y_aberto(f, a, 1, h)
+    y2 = y_aberto(f, a, 2, h)
+    y3 = y_aberto(f, a, 3, h)
 
     soma = 11 * y0 + y1 + y2 + 11 * y3
     return 5 * h / 24 * soma
